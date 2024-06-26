@@ -41,8 +41,8 @@ func run(ctx context.Context, listener net.Listener) error {
 	eg, ctx := errgroup.WithContext(ctx)
 
 	eg.Go(func() error {
-		if err := server.Serve(listener); err != nil &&
-			err != http.ErrServerClosed {
+		err := server.Serve(listener)
+		if err != nil && err != http.ErrServerClosed {
 			log.Printf("failed to close: %+v", err)
 			return err
 		}
@@ -50,11 +50,13 @@ func run(ctx context.Context, listener net.Listener) error {
 	})
 
 	<-ctx.Done()
-	if err := server.Shutdown(context.Background()); err != nil {
+
+	err := server.Shutdown(context.Background())
+
+	if err != nil {
 		log.Printf("failed to shutdown: %+v", err)
 	}
 
-	// Goメソッドで起動した別ゴルーチンの終了を待つ
 	return eg.Wait()
 
 }
