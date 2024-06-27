@@ -22,6 +22,7 @@ func TestRun(t *testing.T) {
 	eg.Go(func() error {
 		return run(ctx, l)
 	})
+
 	in := "message"
 	url := fmt.Sprintf("http://%s/%s", l.Addr().String(), in)
 	t.Logf("try request to %q", url)
@@ -31,10 +32,12 @@ func TestRun(t *testing.T) {
 		t.Errorf("failed to get: %+v", err)
 	}
 	defer rsp.Body.Close()
+
 	got, err := io.ReadAll(rsp.Body)
 	if err != nil {
 		t.Fatalf("failde to read body: %v", err)
 	}
+
 	want := fmt.Sprintf("Hello, %s!", in)
 	if string(got) != want {
 		t.Errorf("want %q, but got %q", want, got)
