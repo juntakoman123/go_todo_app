@@ -5,58 +5,34 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"net/http"
 	"os"
 
-	"golang.org/x/sync/errgroup"
+	"github.com/juntakoman123/go_todo_app/config"
 )
 
 func main() {
-	if len(os.Args) != 2 {
-		log.Printf("need port number\n")
-		os.Exit(1)
-	}
-
-	port := os.Args[1]
-	listener, err := net.Listen("tcp", ":"+port)
-
-	if err != nil {
-		log.Fatalf("failed to listen port %s: %v", port, err)
-	}
-
-	err = run(context.Background(), listener)
-
+	err := run(context.Background())
 	if err != nil {
 		log.Printf("Failed to terminate server: %v", err)
 		os.Exit(1)
 	}
 }
 
-func run(ctx context.Context, listener net.Listener) error {
-	server := &http.Server{
-		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprintf(w, "Hello, %s!", r.URL.Path[1:])
-		}),
-	}
-	eg, ctx := errgroup.WithContext(ctx)
-
-	eg.Go(func() error {
-		err := server.Serve(listener)
-		if err != nil && err != http.ErrServerClosed {
-			log.Printf("failed to close: %+v", err)
-			return err
-		}
-		return nil
-	})
-
-	<-ctx.Done()
-
-	err := server.Shutdown(context.Background())
-
+func run(ctx context.Context) error {
+	cfg, err := config.New()
 	if err != nil {
-		log.Printf("failed to shutdown: %+v", err)
+		return err
 	}
 
-	return eg.Wait()
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.Port))
+	if err != nil {
+		log.Fatalf("failed to listen port %d: %v", cfg.Port, err)
+	}
+	url := fmt.Sprintf("http://%s", listener.Addr().String())
+	log.Printf("start with: %v", url)
+
+	mux := NewMux()
+	server := NewServer(listener, mux)
+	return server.Run(ctx)
 
 }
