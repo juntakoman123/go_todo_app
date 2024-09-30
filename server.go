@@ -43,5 +43,4 @@ func (s *Server) Run(ctx context.Context) error {
 	}
 
 	return eg.Wait()
-
 }

@@ -17,5 +17,4 @@ func New() (*Config, error) {
 	}
 
 	return cfg, nil
-
 }

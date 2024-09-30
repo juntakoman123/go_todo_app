@@ -18,7 +18,6 @@ func main() {
 }
 
 func run(ctx context.Context) error {
-
 	cfg, err := config.New()
 	if err != nil {
 		return err
@@ -36,5 +35,4 @@ func run(ctx context.Context) error {
 	s := NewServer(l, mux)
 
 	return s.Run(ctx)
-
 }
