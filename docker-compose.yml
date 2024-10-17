@@ -34,4 +34,3 @@ services:
       - "33306:3306"
 volumes:
   todo-db-data:
-  
