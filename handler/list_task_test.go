@@ -1,12 +1,12 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/juntakoman123/go_todo_app/entity"
-	"github.com/juntakoman123/go_todo_app/store"
 	"github.com/juntakoman123/go_todo_app/testutil"
 )
 
@@ -16,20 +16,20 @@ func TestListTask(t *testing.T) {
 		rspFile string
 	}
 	tests := map[string]struct {
-		tasks map[entity.TaskID]*entity.Task
+		tasks []*entity.Task
 		want  want
 	}{
 		"ok": {
-			tasks: map[entity.TaskID]*entity.Task{
-				1: {
+			tasks: []*entity.Task{
+				{
 					ID:     1,
 					Title:  "test1",
-					Status: "todo",
+					Status: entity.TaskStatusTodo,
 				},
-				2: {
+				{
 					ID:     2,
 					Title:  "test2",
-					Status: "done",
+					Status: entity.TaskStatusDone,
 				},
 			},
 			want: want{
@@ -38,7 +38,7 @@ func TestListTask(t *testing.T) {
 			},
 		},
 		"empty": {
-			tasks: map[entity.TaskID]*entity.Task{},
+			tasks: []*entity.Task{},
 			want: want{
 				status:  http.StatusOK,
 				rspFile: "testdata/list_task/empty_rsp.json.golden",
@@ -53,7 +53,11 @@ func TestListTask(t *testing.T) {
 			w := httptest.NewRecorder()
 			r := httptest.NewRequest(http.MethodGet, "/tasks", nil)
 
-			sut := ListTask{Store: &store.TaskStore{Tasks: tt.tasks}}
+			moq := &ListTasksServiceMock{}
+			moq.ListTasksFunc = func(ctx context.Context) (entity.Tasks, error) {
+				return tt.tasks, nil
+			}
+			sut := ListTask{Service: moq}
 			sut.ServeHTTP(w, r)
 
 			resp := w.Result()
