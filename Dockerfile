@@ -1,5 +1,5 @@
 # デプロイ用コンテナに含めるバイナリを作成するコンテナ
-FROM golang:1.21.4 as deploy-builder
+FROM golang:1.23.0 as deploy-builder
 
 WORKDIR /app
 
@@ -22,7 +22,7 @@ CMD ["./app"]
 
 # ---------------------------------------------------
 
-FROM golang:1.21.4 as dev
+FROM golang:1.23.0 as dev
 WORKDIR /app
 RUN go install github.com/cosmtrek/air@v1.40.0
 CMD ["air"]

@@ -1,8 +1,8 @@
 module github.com/juntakoman123/go_todo_app
 
-go 1.23
+go 1.22.5
 
-toolchain go1.23.2
+toolchain go1.22.8
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
@@ -12,7 +12,7 @@ require (
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/google/go-cmp v0.6.0
 	github.com/jmoiron/sqlx v1.4.0
-	github.com/matryer/moq v0.5.0
+	github.com/matryer/moq v0.4.0
 	golang.org/x/sync v0.8.0
 )
 
